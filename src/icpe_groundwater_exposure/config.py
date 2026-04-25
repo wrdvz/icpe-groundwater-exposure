@@ -19,6 +19,10 @@ N_YEARS = END_YEAR - START_YEAR
 # ============================================================
 
 ROBUST_THRESHOLD = 5
+ICPE_RADIUS_KM = 20
+ICPE_RADIUS_M = ICPE_RADIUS_KM * 1000
+GRID_SIZE_KM = 20
+GRID_SIZE_M = GRID_SIZE_KM * 1000
 
 # ============================================================
 # CRS
@@ -108,6 +112,9 @@ RAW_DUCKDB_FILE = (
     / f"groundwater_network70_{START_YEAR}_{END_YEAR}.duckdb"
 )
 
+RAW_ICPE_FILE = PROJECT_ROOT / "data" / "raw" / "icpe" / "icpe_installation_classee.csv"
+RAW_BNPE_WITHDRAWALS_FILE = PROJECT_ROOT / "data" / "raw" / "prelevements" / "prelevements.csv"
+
 # ============================================================
 # OUTPUT DIRECTORIES
 # ============================================================
@@ -121,6 +128,7 @@ MAPPING_DIR = PROCESSED_DIR / "mapping"
 AGGREGATION_DIR = PROCESSED_DIR / "aggregation"
 GEOMETRY_DIR = PROCESSED_DIR / "geometry"
 MAPS_DIR = OUTPUTS_DIR / "maps"
+ICPE_PROCESSED_DIR = PROCESSED_DIR / "icpe"
 
 # ============================================================
 # OUTPUT FILES
@@ -160,6 +168,39 @@ OUT_HTML = (
     MAPS_DIR
     / f"groundwater_france_exclusive_polygons_{START_YEAR}_{END_YEAR}.html"
 )
+
+NORMALIZED_ICPE_FILE = ICPE_PROCESSED_DIR / "icpe_sites_normalized.csv"
+
+ICPE_GROUNDWATER_CONTEXT_FILE = (
+    ICPE_PROCESSED_DIR
+    / f"icpe_groundwater_context_{START_YEAR}_{END_YEAR}_{ICPE_RADIUS_KM}km.csv"
+)
+
+NORMALIZED_BNPE_WITHDRAWALS_FILE = (
+    PROCESSED_DIR / "prelevements" / "bnpe_groundwater_withdrawals_normalized.csv"
+)
+
+ICPE_BNPE_MATCHES_FILE = (
+    ICPE_PROCESSED_DIR / "icpe_bnpe_withdrawal_matches_2023.csv"
+)
+
+ICPE_BNPE_BEST_MATCH_FILE = (
+    ICPE_PROCESSED_DIR / "icpe_bnpe_best_match_2023.csv"
+)
+
+ICPE_BNPE_ECONOMIC_BEST_MATCH_FILE = (
+    ICPE_PROCESSED_DIR / "icpe_bnpe_economic_best_match_2023.csv"
+)
+
+EXPOSURE_GRID_FILE = (
+    PROCESSED_DIR / "grid" / f"icpe_exposure_grid_{GRID_SIZE_KM}km.csv"
+)
+
+EXPOSURE_GRID_GEOJSON_FILE = (
+    PROCESSED_DIR / "grid" / f"icpe_exposure_grid_{GRID_SIZE_KM}km.geojson"
+)
+
+EXPOSURE_MAP_HTML_FILE = DOCS_HTML_FILE = PROJECT_ROOT / "docs" / "index.html"
 
 # ============================================================
 # GEO DATA

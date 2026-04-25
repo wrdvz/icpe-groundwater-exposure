@@ -7,6 +7,22 @@ __pycache__/
 .ipynb_checkpoints/
 *.log
 
+# Python / build artifacts
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+dist/
+build/
+
+# Local editor / OS noise
+.vscode/
+.idea/
+
+# Temporary files
+*.tmp
+*.temp
+*.bak
+
 data/raw/water/*.duckdb
 data/raw/water/*.wal
 data/raw/water/*.tmp
@@ -21,9 +37,29 @@ data/external/geo/france_aquiferes/BDLISA_V3_METRO-gpkg/BDLISA_V3_METRO.gpkg
 data/external/geo/france_aquiferes/BDLISA_V3_METRO-gpkg/Descriptif_donnees_BDLISA_V3.pdf
 data/external/geo/france_aquiferes/BDLISA_V3_METRO-gpkg/symbologie/
 
-# ICPE local/raw extracts
+# Large raw source extracts (kept local, regenerated or manually re-downloaded)
 data/raw/icpe/*.csv
 data/raw/icpe/*.geojson
 data/raw/icpe/*.gpkg
 data/raw/icpe/*.sqlite
 data/raw/icpe/*.zip
+data/raw/prelevements/*.csv
+
+# Heavy processed intermediates
+data/processed/icpe/icpe_bnpe_best_match_2023.csv
+data/processed/icpe/icpe_bnpe_economic_best_match_2023.csv
+data/processed/icpe/icpe_bnpe_withdrawal_matches_2023.csv
+data/processed/icpe/icpe_groundwater_context_2005_2025_20km.csv
+data/processed/icpe/icpe_sites_normalized.csv
+data/processed/icpe/icpe_sites_normalized_with_water_taxonomy_7.csv
+data/processed/prelevements/*.csv
+
+# Heavy local references / generated previews
+docs/reference/groundwater_trends_reference.html
+
+# Keep lightweight structured outputs useful for the published project
+!data/processed/grid/
+!data/processed/grid/*.csv
+!data/processed/grid/*.geojson
+!data/processed/icpe/naf_taxonomy_mapping.csv
+!data/processed/icpe/naf_water_taxonomy_7.csv

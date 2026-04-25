@@ -1,0 +1,88 @@
+code_naf,lib_naf,sur_categorie,sur_sur_categorie,score_probabilite_nappe_1_10
+1,Culture et production animale, chasse et services annexes,Agriculture et élevage,Agriculture,8
+2,Sylviculture et exploitation forestière,Forêt et bois amont,Agriculture,3
+3,Pêche et aquaculture,Pêche et aquaculture,Agriculture,7
+5,Extraction de houille et de lignite,Extraction et ressources primaires,Ressources énergie eau déchets,7
+6,Extraction d'hydrocarbures,Extraction et ressources primaires,Ressources énergie eau déchets,7
+7,Extraction de minerais métalliques,Extraction et ressources primaires,Ressources énergie eau déchets,7
+8,Autres industries extractives,Extraction et ressources primaires,Ressources énergie eau déchets,6
+9,Services de soutien aux industries extractives,Extraction et ressources primaires,Ressources énergie eau déchets,5
+10,Industries alimentaires,Agro-industrie,Industrie manufacturière,8
+11,Fabrication de boissons,Agro-industrie,Industrie manufacturière,8
+12,Fabrication de produits à base de tabac,Agro-industrie,Industrie manufacturière,5
+13,Fabrication de textiles,Matériaux et biens intermédiaires,Industrie manufacturière,6
+14,Industrie de l'habillement,Matériaux et biens intermédiaires,Industrie manufacturière,4
+15,Industrie du cuir et de la chaussure,Matériaux et biens intermédiaires,Industrie manufacturière,6
+16,"Travail du bois et fabrication d'articles en bois et en liège, à l’exception des meubles ; fabrication d’articles en vannerie et sparterie",Matériaux et biens intermédiaires,Industrie manufacturière,6
+17,Industrie du papier et du carton,Matériaux et biens intermédiaires,Industrie manufacturière,8
+18,Imprimerie et reproduction d'enregistrements,Matériaux et biens intermédiaires,Industrie manufacturière,4
+19,Cokéfaction et raffinage,Énergie et utilités,Ressources énergie eau déchets,7
+20,Industrie chimique,Chimie pharmacie matières,Industrie manufacturière,9
+21,Industrie pharmaceutique,Chimie pharmacie matières,Industrie manufacturière,8
+22,Fabrication de produits en caoutchouc et en plastique,Chimie pharmacie matières,Industrie manufacturière,7
+23,Fabrication d'autres produits minéraux non métalliques,Chimie pharmacie matières,Industrie manufacturière,7
+24,Métallurgie,Chimie pharmacie matières,Industrie manufacturière,8
+25,"Fabrication de produits métalliques, à l’exception des machines et des équipements",Mécanique équipements électronique,Industrie manufacturière,6
+26,Fabrication de produits informatiques, électroniques et optiques,Mécanique équipements électronique,Industrie manufacturière,4
+27,Fabrication d'équipements électriques,Mécanique équipements électronique,Industrie manufacturière,5
+28,Fabrication de machines et équipements n.c.a.,Mécanique équipements électronique,Industrie manufacturière,5
+29,Industrie automobile,Transport et matériel roulant,Industrie manufacturière,7
+30,Fabrication d'autres matériels de transport,Transport et matériel roulant,Industrie manufacturière,6
+31,Fabrication de meubles,Matériaux et biens intermédiaires,Industrie manufacturière,4
+32,Autres industries manufacturières,Manufactures diverses,Industrie manufacturière,5
+33,Réparation et installation de machines et d'équipements,Mécanique équipements électronique,Industrie manufacturière,4
+35,"Production et distribution d'électricité, de gaz, de vapeur et d'air conditionné",Énergie et utilités,Ressources énergie eau déchets,7
+36,Captage, traitement et distribution d'eau,Eau et assainissement,Ressources énergie eau déchets,10
+37,Collecte et traitement des eaux usées,Eau et assainissement,Ressources énergie eau déchets,8
+38,Collecte, traitement et élimination des déchets ; récupération,Déchets et dépollution,Ressources énergie eau déchets,5
+39,Dépollution et autres services de gestion des déchets,Déchets et dépollution,Ressources énergie eau déchets,5
+41,Construction de bâtiments,Construction et travaux,Construction aménagement,4
+42,Génie civil,Construction et travaux,Construction aménagement,5
+43,Travaux de construction spécialisés,Construction et travaux,Construction aménagement,4
+45,Commerce et réparation d'automobiles et de motocycles,Commerce et logistique,Commerce logistique transports,3
+46,"Commerce de gros, à l’exception des automobiles et des motocycles",Commerce et logistique,Commerce logistique transports,3
+47,"Commerce de détail, à l’exception des automobiles et des motocycles",Commerce et logistique,Commerce logistique transports,2
+49,Transports terrestres et transport par conduites,Transports,Commerce logistique transports,4
+50,Transports par eau,Transports,Commerce logistique transports,4
+51,Transports aériens,Transports,Commerce logistique transports,3
+52,Entreposage et services auxiliaires des transports,Commerce et logistique,Commerce logistique transports,3
+53,Activités de poste et de courrier,Commerce et logistique,Commerce logistique transports,2
+55,Hébergement,Hébergement restauration tourisme,Services aux personnes,3
+56,Restauration,Hébergement restauration tourisme,Services aux personnes,3
+58,Édition,Numérique information télécom médias,Services marchands aux entreprises,1
+59,"Production de films cinématographiques, de vidéo et de programmes de télévision ; enregistrement sonore et édition musicale",Numérique information télécom médias,Services marchands aux entreprises,1
+60,Programmation et diffusion,Numérique information télécom médias,Services marchands aux entreprises,1
+61,Télécommunications,Numérique information télécom médias,Services marchands aux entreprises,2
+62,"Programmation, conseil et autres activités informatiques",Numérique information télécom médias,Services marchands aux entreprises,1
+63,Services d'information,Numérique information télécom médias,Services marchands aux entreprises,1
+64,"Activités des services financiers, hors assurance et caisses de retraite",Finance assurance,Services marchands aux entreprises,1
+65,Assurance,Finance assurance,Services marchands aux entreprises,1
+66,Activités auxiliaires de services financiers et d'assurance,Finance assurance,Services marchands aux entreprises,1
+68,Activités immobilières,Immobilier et aménagement,Construction aménagement,1
+69,Activités juridiques et comptables,Conseil gestion administratif,Services marchands aux entreprises,1
+70,Activités des sièges sociaux ; conseil de gestion,Conseil gestion administratif,Services marchands aux entreprises,1
+71,Activités d'architecture et d'ingénierie ; activités de contrôle et analyses techniques,Architecture ingénierie technique,Construction aménagement,3
+72,Recherche-développement scientifique,Architecture ingénierie technique,Construction aménagement,3
+73,Publicité et études de marché,Conseil gestion administratif,Services marchands aux entreprises,1
+74,Autres activités spécialisées, scientifiques et techniques,Architecture ingénierie technique,Construction aménagement,2
+75,Activités vétérinaires,Services liés au vivant,Agriculture,4
+77,Activités de location et location-bail,Conseil gestion administratif,Services marchands aux entreprises,2
+78,Activités liées à l'emploi,Conseil gestion administratif,Services marchands aux entreprises,1
+79,"Activités des agences de voyage, voyagistes, services de réservation et activités connexes",Hébergement restauration tourisme,Services aux personnes,1
+80,Enquêtes et sécurité,Conseil gestion administratif,Services marchands aux entreprises,2
+81,Services relatifs aux bâtiments et aménagement paysager,Immobilier et aménagement,Construction aménagement,3
+82,Activités administratives et autres activités de soutien aux entreprises,Conseil gestion administratif,Services marchands aux entreprises,1
+84,"Administration publique et défense ; sécurité sociale obligatoire",Administration et sécurité,Secteur public collectif institutions,2
+85,Enseignement,Enseignement,Secteur public collectif institutions,1
+86,Activités pour la santé humaine,Santé médico-social social,Services aux personnes,3
+87,Hébergement médico-social et social,Santé médico-social social,Services aux personnes,3
+88,Action sociale sans hébergement,Santé médico-social social,Services aux personnes,1
+90,Activités créatives, artistiques et de spectacle,Loisirs culture sport,Services aux personnes,1
+91,"Bibliothèques, archives, musées et autres activités culturelles",Loisirs culture sport,Services aux personnes,1
+92,Organisation de jeux de hasard et d'argent,Loisirs culture sport,Services aux personnes,2
+93,Activités sportives, récréatives et de loisirs,Loisirs culture sport,Services aux personnes,3
+94,Activités des organisations associatives,Organisations collectives,Secteur public collectif institutions,1
+95,Réparation d'ordinateurs et de biens personnels et domestiques,Mécanique équipements électronique,Industrie manufacturière,2
+96,Autres services personnels,Services personnels,Services aux personnes,1
+97,Activités des ménages en tant qu'employeurs de personnel domestique,Services personnels,Services aux personnes,1
+99,Activités des organisations et organismes extraterritoriaux,Organisations collectives,Secteur public collectif institutions,1

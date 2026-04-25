@@ -1,0 +1,88 @@
+code_naf,lib_naf,categorie_eau_7,score_probabilite_nappe_1_10,dans_perimetre_eau
+1,"Culture et production animale, chasse et services annexes",Agriculture et élevage,8,True
+2,Sylviculture et exploitation forestière,,3,False
+3,Pêche et aquaculture,Agriculture et élevage,7,True
+5,Extraction de houille et de lignite,"Extraction, carrières, eau, déchets, énergie",7,True
+6,Extraction d'hydrocarbures,"Extraction, carrières, eau, déchets, énergie",7,True
+7,Extraction de minerais métalliques,"Extraction, carrières, eau, déchets, énergie",7,True
+8,Autres industries extractives,"Extraction, carrières, eau, déchets, énergie",6,True
+9,Services de soutien aux industries extractives,"Extraction, carrières, eau, déchets, énergie",5,True
+10,Industries alimentaires,Agro-industrie,8,True
+11,Fabrication de boissons,Agro-industrie,8,True
+12,Fabrication de produits à base de tabac,Agro-industrie,5,True
+13,Fabrication de textiles,"Papier, bois, textile, cuir",6,True
+14,Industrie de l'habillement,"Papier, bois, textile, cuir",4,True
+15,Industrie du cuir et de la chaussure,"Papier, bois, textile, cuir",6,True
+16,"Travail du bois et fabrication d'articles en bois et en liège, à l’exception des meubles ; fabrication d’articles en vannerie et sparterie","Papier, bois, textile, cuir",6,True
+17,Industrie du papier et du carton,"Papier, bois, textile, cuir",8,True
+18,Imprimerie et reproduction d'enregistrements,"Papier, bois, textile, cuir",4,True
+19,Cokéfaction et raffinage,"Extraction, carrières, eau, déchets, énergie",7,True
+20,Industrie chimique,"Santé, chimie, produits de synthèse",9,True
+21,Industrie pharmaceutique,"Santé, chimie, produits de synthèse",8,True
+22,Fabrication de produits en caoutchouc et en plastique,"Santé, chimie, produits de synthèse",7,True
+23,Fabrication d'autres produits minéraux non métalliques,"Extraction, carrières, eau, déchets, énergie",7,True
+24,Métallurgie,"Métallurgie, mécanique, automobile",8,True
+25,"Fabrication de produits métalliques, à l’exception des machines et des équipements","Métallurgie, mécanique, automobile",6,True
+26,"Fabrication de produits informatiques, électroniques et optiques","Métallurgie, mécanique, automobile",4,True
+27,Fabrication d'équipements électriques,"Métallurgie, mécanique, automobile",5,True
+28,Fabrication de machines et équipements n.c.a.,"Métallurgie, mécanique, automobile",5,True
+29,Industrie automobile,"Métallurgie, mécanique, automobile",7,True
+30,Fabrication d'autres matériels de transport,"Métallurgie, mécanique, automobile",6,True
+31,Fabrication de meubles,"Papier, bois, textile, cuir",4,True
+32,Autres industries manufacturières,,5,False
+33,Réparation et installation de machines et d'équipements,"Métallurgie, mécanique, automobile",4,True
+35,"Production et distribution d'électricité, de gaz, de vapeur et d'air conditionné","Extraction, carrières, eau, déchets, énergie",7,True
+36,"Captage, traitement et distribution d'eau","Extraction, carrières, eau, déchets, énergie",10,True
+37,Collecte et traitement des eaux usées,"Extraction, carrières, eau, déchets, énergie",8,True
+38,"Collecte, traitement et élimination des déchets ; récupération","Extraction, carrières, eau, déchets, énergie",5,True
+39,Dépollution et autres services de gestion des déchets,"Extraction, carrières, eau, déchets, énergie",5,True
+41,Construction de bâtiments,Construction et génie civil,5,True
+42,Génie civil,Construction et génie civil,6,True
+43,Travaux de construction spécialisés,Construction et génie civil,5,True
+45,Commerce et réparation d'automobiles et de motocycles,,3,False
+46,"Commerce de gros, à l’exception des automobiles et des motocycles",,3,False
+47,"Commerce de détail, à l’exception des automobiles et des motocycles",,2,False
+49,Transports terrestres et transport par conduites,,4,False
+50,Transports par eau,,4,False
+51,Transports aériens,,3,False
+52,Entreposage et services auxiliaires des transports,,3,False
+53,Activités de poste et de courrier,,2,False
+55,Hébergement,,3,False
+56,Restauration,,3,False
+58,Édition,,1,False
+59,"Production de films cinématographiques, de vidéo et de programmes de télévision ; enregistrement sonore et édition musicale",,1,False
+60,Programmation et diffusion,,1,False
+61,Télécommunications,,2,False
+62,"Programmation, conseil et autres activités informatiques",,1,False
+63,Services d'information,,1,False
+64,"Activités des services financiers, hors assurance et caisses de retraite",,1,False
+65,Assurance,,1,False
+66,Activités auxiliaires de services financiers et d'assurance,,1,False
+68,Activités immobilières,,1,False
+69,Activités juridiques et comptables,,1,False
+70,Activités des sièges sociaux ; conseil de gestion,,1,False
+71,Activités d'architecture et d'ingénierie ; activités de contrôle et analyses techniques,,3,False
+72,Recherche-développement scientifique,,3,False
+73,Publicité et études de marché,,1,False
+74,"Autres activités spécialisées, scientifiques et techniques",,2,False
+75,Activités vétérinaires,,4,False
+77,Activités de location et location-bail,,2,False
+78,Activités liées à l'emploi,,1,False
+79,"Activités des agences de voyage, voyagistes, services de réservation et activités connexes",,1,False
+80,Enquêtes et sécurité,,2,False
+81,Services relatifs aux bâtiments et aménagement paysager,,3,False
+82,Activités administratives et autres activités de soutien aux entreprises,,1,False
+84,Administration publique et défense ; sécurité sociale obligatoire,,2,False
+85,Enseignement,,1,False
+86,Activités pour la santé humaine,,3,False
+87,Hébergement médico-social et social,,3,False
+88,Action sociale sans hébergement,,1,False
+90,"Activités créatives, artistiques et de spectacle",,1,False
+91,"Bibliothèques, archives, musées et autres activités culturelles",,1,False
+92,Organisation de jeux de hasard et d'argent,,2,False
+93,"Activités sportives, récréatives et de loisirs",,3,False
+94,Activités des organisations associatives,,1,False
+95,Réparation d'ordinateurs et de biens personnels et domestiques,,2,False
+96,Autres services personnels,,1,False
+97,Activités des ménages en tant qu'employeurs de personnel domestique,,1,False
+99,Activités des organisations et organismes extraterritoriaux,,1,False
