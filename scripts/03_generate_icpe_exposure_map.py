@@ -368,7 +368,7 @@ def construire_html(grille_geojson, points_icpe) -> str:
       zoomSnap: 0.5
     }});
 
-    L.tileLayer('https://data.geopf.fr/wmts?SERVICE=WMTS&REQUEST=GetTile&VERSION=1.0.0&LAYER=GEOGRAPHICALGRIDSYSTEMS.PLANIGNV2&STYLE=normal&FORMAT=image/png&TILEMATRIXSET=LAMB93&TILEMATRIX={{z}}&TILEROW={{y}}&TILECOL={{x}}', {{
+    L.tileLayer('https://data.geopf.fr/wmts?SERVICE=WMTS&REQUEST=GetTile&VERSION=1.0.0&LAYER=GEOGRAPHICALGRIDSYSTEMS.PLANIGNV2.L93&STYLE=normal&FORMAT=image/png&TILEMATRIXSET=LAMB93&TILEMATRIX={{z}}&TILEROW={{y}}&TILECOL={{x}}', {{
       tileSize: 256,
       attribution: 'Fond cartographique IGN',
       maxZoom: 18
