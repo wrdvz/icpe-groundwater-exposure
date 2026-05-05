@@ -81,6 +81,18 @@ def popup_grille(row) -> str:
     )
 
 
+def resume_grille(row) -> str:
+    robuste = "oui" if bool(row.get("groundwater_signal_robust")) else "non"
+    return (
+        f"<strong>{LIBELLES_FOND.get(row.get('exposure_class_2x2'), row.get('exposure_class_2x2'))}</strong><br>"
+        f"Volume AEP+IND+IRR : {_fmt_int(row.get('withdrawal_pressure_volume_m3'))} m3<br>"
+        f"Prélèvements AEP+IND+IRR : {_fmt_int(row.get('withdrawal_pressure_count'))}<br>"
+        f"Tendance médiane des nappes : {_fmt_float(row.get('groundwater_median_variation_20y_cm'), 1, ' cm')}<br>"
+        f"Stations : {_fmt_int(row.get('station_count'))}<br>"
+        f"Signal robuste : {robuste}"
+    )
+
+
 def popup_icpe(row) -> str:
     robuste = "oui" if bool(row.get("is_signal_solid")) else "non"
     return (
@@ -92,6 +104,19 @@ def popup_icpe(row) -> str:
         f"Tendance médiane des nappes (20 km) : {_fmt_float(row.get('median_variation_20y_cm_20km'), 1, ' cm')}<br>"
         f"Stations nappes (20 km) : {_fmt_int(row.get('n_stations_20km'))}<br>"
         f"Signal nappe robuste : {robuste}"
+    )
+
+
+def resume_icpe(row) -> str:
+    robuste = "oui" if bool(row.get("is_signal_solid")) else "non"
+    return (
+        f"<strong>{row.get('nom_ets', 'Site sans nom')}</strong><br>"
+        f"{row.get('categorie_eau_7', 'n.d.')}<br>"
+        f"Commune : {row.get('commune', 'n.d.')}<br>"
+        f"NAF : {row.get('code_naf', 'n.d.')} - {row.get('lib_naf', 'n.d.')}<br>"
+        f"Tendance nappe (20 km) : {_fmt_float(row.get('median_variation_20y_cm_20km'), 1, ' cm')}<br>"
+        f"Stations (20 km) : {_fmt_int(row.get('n_stations_20km'))}<br>"
+        f"Signal robuste : {robuste}"
     )
 
 
@@ -219,6 +244,7 @@ def charger_grille():
     grille["has_withdrawal_data"] = grille["withdrawal_pressure_count"] > 0
     grille["context_only_withdrawal"] = grille["has_withdrawal_data"] & ~grille["has_groundwater_data"]
     grille["popup_html"] = grille.apply(popup_grille, axis=1)
+    grille["hover_html"] = grille.apply(resume_grille, axis=1)
     grille = grille.to_crs("EPSG:4326")
     return json.loads(grille.to_json())
 
@@ -233,6 +259,7 @@ def charger_icpe():
     gdf["lon"] = gdf.geometry.x
     gdf["lat"] = gdf.geometry.y
     gdf["popup_html"] = gdf.apply(popup_icpe, axis=1)
+    gdf["hover_html"] = gdf.apply(resume_icpe, axis=1)
     return [
         {
             "lat": row["lat"],
@@ -240,6 +267,7 @@ def charger_icpe():
             "categorie": row["categorie_eau_7"],
             "couleur": COULEURS_SECTEURS.get(row["categorie_eau_7"], COULEURS_POINTS["GRIS"]),
             "popup_html": row["popup_html"],
+            "hover_html": row["hover_html"],
         }
         for _, row in gdf.iterrows()
     ]
@@ -302,15 +330,20 @@ def construire_html(grille_geojson, points_icpe) -> str:
     html, body {{ height: 100%; margin: 0; font-family: Inter, system-ui, sans-serif; color: #16202a; }}
     #map {{ position: absolute; inset: 0; background: #f5f5f4; }}
     .panel {{
-      position: absolute; top: 16px; left: 16px; z-index: 1000; width: 390px;
+      position: absolute; top: 16px; left: 16px; bottom: 16px; z-index: 1000; width: 390px;
       background: rgba(255,255,255,0.95); border: 1px solid #d6dde5; border-radius: 8px;
-      padding: 14px 16px; box-shadow: 0 8px 24px rgba(0,0,0,0.08);
+      padding: 14px 16px; box-shadow: 0 8px 24px rgba(0,0,0,0.08); overflow: auto;
     }}
     .panel h1 {{ margin: 0 0 10px; font-size: 20px; line-height: 1.1; }}
     .panel p {{ margin: 0 0 10px; font-size: 13px; line-height: 1.45; color: #455468; }}
     .legend {{ margin-top: 12px; display: grid; gap: 6px; font-size: 12px; }}
     .legend-row {{ display: flex; align-items: center; gap: 8px; }}
     .swatch {{ width: 14px; height: 14px; border-radius: 2px; border: 1px solid rgba(0,0,0,0.12); flex: 0 0 auto; }}
+    .section-title {{ font-size: 14px; font-weight: 700; margin-top: 8px; margin-bottom: 10px; }}
+    .divider {{ height: 1px; background: #0f172a; opacity: 0.18; margin: 18px 0; }}
+    .hover-box {{ font-size: 13px; line-height: 1.45; color: #334155; min-height: 120px; }}
+    .sources {{ margin-top: 24px; font-size: 12px; line-height: 1.55; color: #334155; }}
+    .sources strong {{ display: block; margin-top: 8px; }}
     .leaflet-popup-content {{ margin: 10px 12px; line-height: 1.35; }}
   </style>
 </head>
@@ -320,6 +353,7 @@ def construire_html(grille_geojson, points_icpe) -> str:
     <h1>Exposition des sites ICPE aux nappes souterraines</h1>
     <p>Grille de 20 km combinant la tendance des nappes et les volumes de prélèvements BNPE pour les usages eau potable, industriels et d'irrigation. Seules les cellules avec observations piézométriques sont classées.</p>
     <p>Le fond représente une pression territoriale plus systémique sur la ressource. La carte charge un seul secteur ICPE au démarrage ; les autres secteurs se chargent à la demande via le sélecteur de couches.</p>
+    <div class="section-title">Légende</div>
     <div class="legend">
       <div class="legend-row"><span class="swatch" style="background:{COULEURS_FOND['high_pressure_declining_groundwater']}"></span>Forte pression + nappe en baisse</div>
       <div class="legend-row"><span class="swatch" style="background:{COULEURS_FOND['low_pressure_declining_groundwater']}"></span>Faible pression + nappe en baisse</div>
@@ -334,12 +368,23 @@ def construire_html(grille_geojson, points_icpe) -> str:
       <div class="legend-row"><span class="swatch" style="background:{COULEURS_SECTEURS['Extraction, carrières, eau, déchets, énergie']}"></span>Extraction, carrières, eau, déchets, énergie</div>
       <div class="legend-row"><span class="swatch" style="background:{COULEURS_SECTEURS['Construction et génie civil']}"></span>Construction et génie civil</div>
     </div>
+    <div class="divider"></div>
+    <div class="section-title">Survoler une maille ou un site</div>
+    <div id="hover-box" class="hover-box">Les informations détaillées apparaîtront ici.</div>
+    <div class="sources">
+      <strong>Sources</strong>
+      BNPE 2023 - eaux souterraines (AEP, IND, IRR)<br>
+      Réseau 070 - surveillance de l'état quantitatif des eaux souterraines<br>
+      ICPE + NAF retraitées pour l'analyse sectorielle<br>
+      Traitements : Parallaxe processing
+    </div>
   </div>
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
   <script>
     const grilleGeojson = {json.dumps(grille_geojson)};
     const pointsICPEParCategorie = {json.dumps(points_icpe_par_categorie)};
     const couleursFond = {json.dumps(COULEURS_FOND)};
+    const hoverDefaultHtml = 'Les informations détaillées apparaîtront ici.';
 
     const map = L.map('map', {{
       center: [46.6, 2.2],
@@ -355,6 +400,14 @@ def construire_html(grille_geojson, points_icpe) -> str:
       maxZoom: 20
     }}).addTo(map);
 
+    function setHoverBox(html) {{
+      document.getElementById('hover-box').innerHTML = html;
+    }}
+
+    function resetHoverBox() {{
+      setHoverBox(hoverDefaultHtml);
+    }}
+
     function styleGrille(feature) {{
       const cls = feature.properties.exposure_class_2x2;
       return {{
@@ -368,7 +421,12 @@ def construire_html(grille_geojson, points_icpe) -> str:
     const coucheGrille = L.geoJSON(grilleGeojson, {{
       style: styleGrille,
       onEachFeature: function(feature, layer) {{
-        layer.bindPopup(feature.properties.popup_html, {{ maxWidth: 340 }});
+        layer.on('mouseover', function() {{
+          setHoverBox(feature.properties.hover_html || feature.properties.popup_html || hoverDefaultHtml);
+        }});
+        layer.on('mouseout', function() {{
+          resetHoverBox();
+        }});
       }}
     }}).addTo(map);
 
@@ -384,7 +442,12 @@ def construire_html(grille_geojson, points_icpe) -> str:
           fillColor: couleur,
           fillOpacity: 0.62
         }});
-        marker.bindPopup(row.popup_html, {{ maxWidth: 360 }});
+        marker.on('mouseover', function() {{
+          setHoverBox(row.hover_html || row.popup_html || hoverDefaultHtml);
+        }});
+        marker.on('mouseout', function() {{
+          resetHoverBox();
+        }});
         layer.addLayer(marker);
       }});
       layer._loaded = true;
