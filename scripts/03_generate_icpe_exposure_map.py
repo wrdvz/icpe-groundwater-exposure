@@ -109,10 +109,12 @@ def popup_icpe(row) -> str:
 
 def resume_icpe(row) -> str:
     robuste = "oui" if bool(row.get("is_signal_solid")) else "non"
+    classe_grille = LIBELLES_FOND.get(row.get("exposure_class_2x2"), "n.d.")
     return (
         f"<strong>{row.get('nom_ets', 'Site sans nom')}</strong><br>"
         f"{row.get('categorie_eau_7', 'n.d.')}<br>"
         f"Commune : {row.get('commune', 'n.d.')}<br>"
+        f"Classe de grille : {classe_grille}<br>"
         f"NAF : {row.get('code_naf', 'n.d.')} - {row.get('lib_naf', 'n.d.')}<br>"
         f"Tendance nappe (20 km) : {_fmt_float(row.get('median_variation_20y_cm_20km'), 1, ' cm')}<br>"
         f"Stations (20 km) : {_fmt_int(row.get('n_stations_20km'))}<br>"
@@ -255,7 +257,10 @@ def charger_icpe():
     points["x"] = pd.to_numeric(points["x"], errors="coerce")
     points["y"] = pd.to_numeric(points["y"], errors="coerce")
     points = points.dropna(subset=["x", "y"]).copy()
-    gdf = gpd.GeoDataFrame(points, geometry=gpd.points_from_xy(points["x"], points["y"]), crs="EPSG:2154").to_crs("EPSG:4326")
+    gdf = gpd.GeoDataFrame(points, geometry=gpd.points_from_xy(points["x"], points["y"]), crs="EPSG:2154")
+    grille = gpd.read_file(EXPOSURE_GRID_GEOJSON_FILE).to_crs("EPSG:2154")[["grid_id", "exposure_class_2x2", "geometry"]]
+    gdf = gpd.sjoin(gdf, grille, how="left", predicate="within").drop(columns=["index_right"], errors="ignore")
+    gdf = gdf.to_crs("EPSG:4326")
     gdf["lon"] = gdf.geometry.x
     gdf["lat"] = gdf.geometry.y
     gdf["popup_html"] = gdf.apply(popup_icpe, axis=1)
