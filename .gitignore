@@ -2,6 +2,9 @@
 __pycache__/
 *.pyc
 .DS_Store
+.wrangler/
+cloudflare/lookup-worker/node_modules/
+outputs/sirene_shards/
 *.egg-info/
 .env
 .ipynb_checkpoints/

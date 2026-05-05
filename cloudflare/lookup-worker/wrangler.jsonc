@@ -1,0 +1,19 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "icpe-groundwater-lookup",
+  "main": "src/index.js",
+  "compatibility_date": "2026-05-05",
+  "observability": {
+    "enabled": true
+  },
+  "r2_buckets": [
+    {
+      "binding": "SIRENE_SHARDS",
+      "bucket_name": "icpe-groundwater-sirene-shards"
+    }
+  ],
+  "vars": {
+    "SHARD_PREFIX_LENGTH": "3",
+    "SHARD_NAMESPACE": "sirene/v1"
+  }
+}
