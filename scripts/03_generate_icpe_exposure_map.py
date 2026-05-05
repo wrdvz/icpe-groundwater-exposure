@@ -358,8 +358,8 @@ def construire_html(grille_geojson, points_icpe) -> str:
     function styleGrille(feature) {{
       const cls = feature.properties.exposure_class_2x2;
       return {{
-        color: '#ffffff',
-        weight: 0.7,
+        color: 'transparent',
+        weight: 0,
         fillColor: couleursFond[cls] || '#cccccc',
         fillOpacity: cls === 'unclassified_no_groundwater_data' ? 0.22 : 0.52
       }};
