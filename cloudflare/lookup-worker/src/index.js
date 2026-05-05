@@ -30,23 +30,32 @@ async function loadShard(env, objectKey) {
 }
 
 function pickResult(record) {
+  const gridLabels = {
+    HPD: "high_pressure_declining_groundwater",
+    LPD: "low_pressure_declining_groundwater",
+    HPN: "high_pressure_non_declining_groundwater",
+    LPN: "low_pressure_non_declining_groundwater",
+    UNC: "unclassified_no_groundwater_data",
+  };
+  const icpeLabels = {
+    AGE: "Agriculture et élevage",
+    AGI: "Agro-industrie",
+    SCP: "Santé, chimie, produits de synthèse",
+    MMA: "Métallurgie, mécanique, automobile",
+    PBTC: "Papier, bois, textile, cuir",
+    ECDE: "Extraction, carrières, eau, déchets, énergie",
+    CGC: "Construction et génie civil",
+  };
   return {
-    siret: record.siret,
-    siren: record.siren ?? null,
-    denomination: record.denomination ?? null,
-    code_naf: record.code_naf ?? null,
-    lib_naf: record.lib_naf ?? null,
-    latitude: record.latitude ?? null,
-    longitude: record.longitude ?? null,
-    geo_score: record.geo_score ?? null,
-    geo_type: record.geo_type ?? null,
-    site_icpe: Boolean(record.site_icpe),
-    icpe_category: record.icpe_category ?? null,
-    icpe_site_sector: record.icpe_site_sector ?? null,
-    icpe_nom_ets: record.icpe_nom_ets ?? null,
-    grid_class: record.grid_class ?? null,
-    groundwater_trend_cm_20y: record.groundwater_trend_cm_20y ?? null,
-    groundwater_station_count_20km: record.groundwater_station_count_20km ?? null,
+    denomination: record.n ?? null,
+    code_naf: record.a ?? null,
+    latitude: record.y ?? null,
+    longitude: record.x ?? null,
+    geo_score: record.gs ?? null,
+    geo_type: record.gt ?? null,
+    site_icpe: Boolean(record.i),
+    icpe_category: record.ic ? icpeLabels[record.ic] ?? null : null,
+    grid_class: record.g ? gridLabels[record.g] ?? null : null,
   };
 }
 

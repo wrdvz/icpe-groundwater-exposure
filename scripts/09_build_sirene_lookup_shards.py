@@ -47,16 +47,9 @@ def _require_column(df: pd.DataFrame, candidates: list[str], label: str) -> str:
 def _normalize_sirene(df: pd.DataFrame) -> pd.DataFrame:
     siret_col = _require_column(df, ["siret"], "siret")
     siren_col = _require_column(df, ["siren"], "siren")
-    lon_col = _require_column(
-        df,
-        ["longitude", "longitude_ban", "x", "long"],
-        "longitude",
-    )
-    lat_col = _require_column(
-        df,
-        ["latitude", "latitude_ban", "y", "lat"],
-        "latitude",
-    )
+    geometry_col = _pick_existing(df, ["geometry"])
+    lon_col = _pick_existing(df, ["longitude", "longitude_ban", "x", "long"])
+    lat_col = _pick_existing(df, ["latitude", "latitude_ban", "y", "lat"])
     naf_col = _pick_existing(df, ["code_naf", "activitePrincipaleEtablissement"])
     lib_naf_col = _pick_existing(df, ["lib_naf", "libelle_activite_principale", "libelleActivitePrincipaleEtablissement"])
     denom_col = _pick_existing(
@@ -72,6 +65,19 @@ def _normalize_sirene(df: pd.DataFrame) -> pd.DataFrame:
     )
     geo_score_col = _pick_existing(df, ["geo_score", "score", "score_geocodage"])
     geo_type_col = _pick_existing(df, ["geo_type", "type_geocodage"])
+    etat_col = _pick_existing(df, ["etatAdministratifEtablissement", "etat_administratif"])
+
+    if geometry_col and (lon_col is None or lat_col is None):
+        geom = gpd.GeoSeries.from_wkb(df[geometry_col], crs="EPSG:4326")
+        longitudes = geom.x
+        latitudes = geom.y
+    else:
+        if lon_col is None:
+            raise KeyError("Impossible de trouver la colonne longitude ni une géométrie exploitable.")
+        if lat_col is None:
+            raise KeyError("Impossible de trouver la colonne latitude ni une géométrie exploitable.")
+        longitudes = pd.to_numeric(df[lon_col], errors="coerce")
+        latitudes = pd.to_numeric(df[lat_col], errors="coerce")
 
     out = pd.DataFrame(
         {
@@ -80,10 +86,11 @@ def _normalize_sirene(df: pd.DataFrame) -> pd.DataFrame:
             "denomination": df[denom_col].astype("string") if denom_col else pd.Series(pd.NA, index=df.index, dtype="string"),
             "code_naf": df[naf_col].astype("string") if naf_col else pd.Series(pd.NA, index=df.index, dtype="string"),
             "lib_naf": df[lib_naf_col].astype("string") if lib_naf_col else pd.Series(pd.NA, index=df.index, dtype="string"),
-            "longitude": pd.to_numeric(df[lon_col], errors="coerce"),
-            "latitude": pd.to_numeric(df[lat_col], errors="coerce"),
+            "longitude": longitudes,
+            "latitude": latitudes,
             "geo_score": pd.to_numeric(df[geo_score_col], errors="coerce") if geo_score_col else pd.Series(pd.NA, index=df.index),
             "geo_type": df[geo_type_col].astype("string") if geo_type_col else pd.Series(pd.NA, index=df.index, dtype="string"),
+            "etat_admin": df[etat_col].astype("string") if etat_col else pd.Series(pd.NA, index=df.index, dtype="string"),
         }
     )
 
@@ -99,7 +106,7 @@ def _load_icpe_lookup() -> pd.DataFrame:
     icpe = icpe[icpe["num_siret"].str.len() == 14].copy()
     icpe = icpe.sort_values(["num_siret", "categorie_eau_7"], na_position="last")
     icpe = icpe.drop_duplicates(subset=["num_siret"], keep="first").copy()
-    return icpe.rename(
+    icpe = icpe.rename(
         columns={
             "num_siret": "siret",
             "categorie_eau_7": "icpe_category",
@@ -108,7 +115,11 @@ def _load_icpe_lookup() -> pd.DataFrame:
             "median_variation_20y_cm_20km": "groundwater_trend_cm_20y",
             "n_stations_20km": "groundwater_station_count_20km",
         }
-    )[
+    )
+    for optional_col in ["groundwater_trend_cm_20y", "groundwater_station_count_20km"]:
+        if optional_col not in icpe.columns:
+            icpe[optional_col] = pd.NA
+    return icpe[
         [
             "siret",
             "icpe_category",
@@ -142,31 +153,42 @@ def _build_shards(df: pd.DataFrame, out_dir: Path, prefix_len: int, namespace: s
     for prefix, chunk in df.groupby("shard_prefix", dropna=True):
         shard = {}
         for _, row in chunk.iterrows():
+            grid_code = None
+            if not pd.isna(row["grid_class"]):
+                grid_code = {
+                    "high_pressure_declining_groundwater": "HPD",
+                    "low_pressure_declining_groundwater": "LPD",
+                    "high_pressure_non_declining_groundwater": "HPN",
+                    "low_pressure_non_declining_groundwater": "LPN",
+                    "unclassified_no_groundwater_data": "UNC",
+                }.get(str(row["grid_class"]), "UNC")
+
+            icpe_code = None
+            if not pd.isna(row["icpe_category"]):
+                icpe_code = {
+                    "Agriculture et élevage": "AGE",
+                    "Agro-industrie": "AGI",
+                    "Santé, chimie, produits de synthèse": "SCP",
+                    "Métallurgie, mécanique, automobile": "MMA",
+                    "Papier, bois, textile, cuir": "PBTC",
+                    "Extraction, carrières, eau, déchets, énergie": "ECDE",
+                    "Construction et génie civil": "CGC",
+                }.get(str(row["icpe_category"]), None)
+
             shard[row["siret"]] = {
-                "siret": row["siret"],
-                "siren": None if pd.isna(row["siren"]) else str(row["siren"]),
-                "denomination": None if pd.isna(row["denomination"]) else str(row["denomination"]),
-                "code_naf": None if pd.isna(row["code_naf"]) else str(row["code_naf"]),
-                "lib_naf": None if pd.isna(row["lib_naf"]) else str(row["lib_naf"]),
-                "longitude": None if pd.isna(row["longitude"]) else float(row["longitude"]),
-                "latitude": None if pd.isna(row["latitude"]) else float(row["latitude"]),
-                "geo_score": None if pd.isna(row["geo_score"]) else float(row["geo_score"]),
-                "geo_type": None if pd.isna(row["geo_type"]) else str(row["geo_type"]),
-                "site_icpe": bool(pd.notna(row["icpe_category"])),
-                "icpe_category": None if pd.isna(row["icpe_category"]) else str(row["icpe_category"]),
-                "icpe_site_sector": None if pd.isna(row["icpe_site_sector"]) else str(row["icpe_site_sector"]),
-                "icpe_nom_ets": None if pd.isna(row["icpe_nom_ets"]) else str(row["icpe_nom_ets"]),
-                "grid_class": None if pd.isna(row["grid_class"]) else str(row["grid_class"]),
-                "groundwater_trend_cm_20y": None
-                if pd.isna(row["groundwater_trend_cm_20y"])
-                else float(row["groundwater_trend_cm_20y"]),
-                "groundwater_station_count_20km": None
-                if pd.isna(row["groundwater_station_count_20km"])
-                else int(row["groundwater_station_count_20km"]),
+                "n": None if pd.isna(row["denomination"]) else str(row["denomination"]),
+                "a": None if pd.isna(row["code_naf"]) else str(row["code_naf"]),
+                "x": None if pd.isna(row["longitude"]) else round(float(row["longitude"]), 6),
+                "y": None if pd.isna(row["latitude"]) else round(float(row["latitude"]), 6),
+                "gs": None if pd.isna(row["geo_score"]) else round(float(row["geo_score"]), 2),
+                "gt": None if pd.isna(row["geo_type"]) else str(row["geo_type"]),
+                "i": 1 if pd.notna(row["icpe_category"]) else 0,
+                "ic": icpe_code,
+                "g": grid_code,
             }
 
         target = base_dir / f"{prefix}.json"
-        target.write_text(json.dumps(shard, ensure_ascii=False), encoding="utf-8")
+        target.write_text(json.dumps(shard, ensure_ascii=False, separators=(",", ":")), encoding="utf-8")
 
 
 def main() -> None:
@@ -175,10 +197,31 @@ def main() -> None:
     parser.add_argument("--out-dir", required=True, help="Dossier de sortie des shards")
     parser.add_argument("--prefix-len", type=int, default=3, help="Longueur du préfixe SIRET pour le sharding")
     parser.add_argument("--namespace", default="sirene/v1", help="Sous-dossier de versionnement des shards")
+    parser.add_argument(
+        "--active-only",
+        action="store_true",
+        help="Ne garder que les établissements administrativement actifs",
+    )
+    parser.add_argument(
+        "--min-geo-score",
+        type=float,
+        default=None,
+        help="Seuil minimal de geo_score à conserver",
+    )
     args = parser.parse_args()
 
     sirene = _read_table(Path(args.sirene))
     sirene_norm = _normalize_sirene(sirene)
+
+    if args.active_only and "etat_admin" in sirene_norm.columns:
+        sirene_norm = sirene_norm[sirene_norm["etat_admin"].fillna("").eq("A")].copy()
+
+    if args.min_geo_score is not None:
+        sirene_norm = sirene_norm[
+            sirene_norm["geo_score"].notna() & (sirene_norm["geo_score"] >= args.min_geo_score)
+        ].copy()
+
+    sirene_norm = sirene_norm.drop(columns=["etat_admin"], errors="ignore")
     icpe = _load_icpe_lookup()
 
     merged = sirene_norm.merge(icpe, on="siret", how="left")

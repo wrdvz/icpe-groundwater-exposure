@@ -5,6 +5,8 @@ __pycache__/
 .wrangler/
 cloudflare/lookup-worker/node_modules/
 outputs/sirene_shards/
+outputs/sirene_shards_active/
+outputs/sirene_shards_active_g08/
 *.egg-info/
 .env
 .ipynb_checkpoints/

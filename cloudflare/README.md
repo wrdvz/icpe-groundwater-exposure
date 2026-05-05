@@ -68,7 +68,7 @@ outputs/sirene_shards/sirene/v1/999.json
 
 ## 3. Uploader les shards dans R2
 
-Exemple avec `wrangler` :
+Test sur quelques fichiers :
 
 ```bash
 cd cloudflare/lookup-worker
@@ -76,7 +76,26 @@ npm install
 npx wrangler r2 object put icpe-groundwater-sirene-shards/sirene/v1/000.json --file ../../outputs/sirene_shards/sirene/v1/000.json
 ```
 
-En pratique, il faudra faire un petit batch d'upload sur tout le dossier.
+Upload batch avec le helper du repo :
+
+```bash
+cd /Users/wrdvz/dev/parallaxe/_portfolio/icpe-groundwater-exposure
+/usr/bin/python3 cloudflare/scripts/upload_r2_shards.py \
+  --bucket icpe-groundwater-sirene-shards \
+  --source-dir outputs/sirene_shards_active_g08/sirene/v1 \
+  --prefix sirene/v1
+```
+
+Test limité sur 20 fichiers :
+
+```bash
+cd /Users/wrdvz/dev/parallaxe/_portfolio/icpe-groundwater-exposure
+/usr/bin/python3 cloudflare/scripts/upload_r2_shards.py \
+  --bucket icpe-groundwater-sirene-shards \
+  --source-dir outputs/sirene_shards_active_g08/sirene/v1 \
+  --prefix sirene/v1 \
+  --limit 20
+```
 
 ## 4. Deployer le Worker
 

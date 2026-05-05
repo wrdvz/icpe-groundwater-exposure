@@ -444,6 +444,7 @@ def construire_html(grille_geojson, points_icpe) -> str:
 
     const panePortfolio = map.createPane('pane-portfolio');
     panePortfolio.style.zIndex = 620;
+    const lookupApiUrl = 'https://icpe-groundwater-lookup.edward-vizard.workers.dev/lookup-siret';
 
     function setHoverBox(html) {{
       document.getElementById('hover-box').innerHTML = html;
@@ -601,17 +602,39 @@ def construire_html(grille_geojson, points_icpe) -> str:
         .replace(/'/g, '&#39;');
     }}
 
-    function buildPortfolioHover(row, portfolioRow) {{
+    function formatGridClass(value) {{
+      const labels = {{
+        high_pressure_declining_groundwater: 'Forte pression + nappe en baisse',
+        low_pressure_declining_groundwater: 'Faible pression + nappe en baisse',
+        high_pressure_non_declining_groundwater: 'Forte pression + nappe non baissière',
+        low_pressure_non_declining_groundwater: 'Faible pression + nappe non baissière',
+        unclassified_no_groundwater_data: 'Non classé (pas de donnée nappe)'
+      }};
+      return labels[value] || value || 'n.d.';
+    }}
+
+    function formatGeoScore(value) {{
+      if (value === null || value === undefined || value === '') return 'n.d.';
+      const num = Number(value);
+      if (!Number.isFinite(num)) return 'n.d.';
+      return num.toFixed(2);
+    }}
+
+    function buildPortfolioHover(row, portfolioRow, localIcpeMatch) {{
       const portfolioName = portfolioRow.company_name || portfolioRow.nom_societe || portfolioRow.portfolio_name || '';
-      const siteName = row.nom_ets || 'Site sans nom';
+      const siteName = localIcpeMatch?.nom_ets || row.denomination || 'Site sans nom';
+      const waterCategory = localIcpeMatch?.categorie || row.icpe_category || 'n.d.';
+      const commune = localIcpeMatch?.commune || 'n.d.';
+      const gridClass = localIcpeMatch?.grid_class || formatGridClass(row.grid_class);
       return `
         <strong>${{escapeHtml(siteName)}}</strong><br>
         ${{portfolioName ? `Portefeuille : ${{escapeHtml(portfolioName)}}<br>` : ''}}
         SIRET : ${{escapeHtml(portfolioRow.siret)}}<br>
-        Site ICPE : oui<br>
-        Catégorie eau : ${{escapeHtml(row.categorie || 'n.d.')}}<br>
-        Commune : ${{escapeHtml(row.commune || 'n.d.')}}<br>
-        Classe de grille : ${{escapeHtml(row.grid_class || 'n.d.')}}
+        Site ICPE : ${{row.site_icpe ? 'oui' : 'non'}}<br>
+        Catégorie eau : ${{escapeHtml(waterCategory)}}<br>
+        Commune : ${{escapeHtml(commune)}}<br>
+        Qualité géoloc : ${{escapeHtml(row.geo_type || 'n.d.')}} (score ${{escapeHtml(formatGeoScore(row.geo_score))}})<br>
+        Classe de grille : ${{escapeHtml(gridClass)}}
       `;
     }}
 
@@ -620,52 +643,69 @@ def construire_html(grille_geojson, points_icpe) -> str:
       updatePortfolioRadii();
     }}
 
-    function renderPortfolioRows(rows) {{
-      clearPortfolioLayer();
-      const matchedSites = [];
-      const unmatched = [];
-
-      rows.forEach((row) => {{
-        const siret = String(row.siret || '').replace(/\\D+/g, '');
-        if (!siret) return;
-        const matches = icpeBySiret.get(siret) || [];
-        if (!matches.length) {{
-          unmatched.push(siret);
-          return;
-        }}
-        matches.forEach((match) => {{
-          matchedSites.push(match);
-          const marker = L.circleMarker([match.lat, match.lon], {{
-            pane: 'pane-portfolio',
-            renderer: portfolioRenderer,
-            radius: portfolioRadiusForZoom(map.getZoom()),
-            stroke: true,
-            weight: 1.6,
-            color: '#0f172a',
-            fillColor: '#facc15',
-            fillOpacity: 0.92
-          }});
-          const hoverHtml = buildPortfolioHover(match, row);
-          marker.on('mouseover', function() {{
-            setHoverBox(hoverHtml);
-          }});
-          marker.on('mouseout', function() {{
-            resetHoverBox();
-          }});
-          portfolioLayer.addLayer(marker);
-        }});
+    async function lookupPortfolioRows(rows) {{
+      const response = await fetch(lookupApiUrl, {{
+        method: 'POST',
+        headers: {{ 'Content-Type': 'application/json' }},
+        body: JSON.stringify({{ sirets: rows.map((row) => row.siret) }})
       }});
+      if (!response.ok) {{
+        throw new Error(`Lookup API error: ${{response.status}}`);
+      }}
+      return await response.json();
+    }}
 
+    function renderPortfolioRows(rows, lookupResults) {{
+      clearPortfolioLayer();
       const status = document.getElementById('portfolio-status');
       if (!rows.length) {{
         status.innerHTML = 'Aucune ligne exploitable trouvée dans le fichier.';
         return;
       }}
 
+      const lookupBySiret = new Map((lookupResults?.results || []).map((result) => [String(result.siret || ''), result]));
+      let displayed = 0;
+      let icpeCount = 0;
+      let unmatchedCount = 0;
+
+      rows.forEach((row) => {{
+        const siret = String(row.siret || '').replace(/\\D+/g, '');
+        if (!siret) return;
+        const result = lookupBySiret.get(siret);
+        if (!result || !result.found || !Number.isFinite(result.latitude) || !Number.isFinite(result.longitude)) {{
+          unmatchedCount += 1;
+          return;
+        }}
+
+        const localIcpeMatch = (icpeBySiret.get(siret) || [])[0] || null;
+        if (result.site_icpe) icpeCount += 1;
+        displayed += 1;
+
+        const marker = L.circleMarker([result.latitude, result.longitude], {{
+          pane: 'pane-portfolio',
+          renderer: portfolioRenderer,
+          radius: portfolioRadiusForZoom(map.getZoom()),
+          stroke: true,
+          weight: 1.6,
+          color: '#0f172a',
+          fillColor: result.site_icpe ? '#facc15' : '#fde68a',
+          fillOpacity: 0.92
+        }});
+        const hoverHtml = buildPortfolioHover(result, row, localIcpeMatch);
+        marker.on('mouseover', function() {{
+          setHoverBox(hoverHtml);
+        }});
+        marker.on('mouseout', function() {{
+          resetHoverBox();
+        }});
+        portfolioLayer.addLayer(marker);
+      }});
+
       status.innerHTML = `
         <strong>${{rows.length}}</strong> lignes lues<br>
-        <strong>${{matchedSites.length}}</strong> points ICPE affichés<br>
-        <strong>${{unmatched.length}}</strong> SIRET sans correspondance
+        <strong>${{displayed}}</strong> points affichés<br>
+        <strong>${{icpeCount}}</strong> sites ICPE reconnus<br>
+        <strong>${{unmatchedCount}}</strong> SIRET sans correspondance
       `;
 
       if (portfolioLayer.getLayers().length) {{
@@ -727,9 +767,10 @@ def construire_html(grille_geojson, points_icpe) -> str:
         }} else {{
           rows = await parsePortfolioWorkbook(file);
         }}
-        renderPortfolioRows(rows);
+        const lookupResults = await lookupPortfolioRows(rows);
+        renderPortfolioRows(rows, lookupResults);
       }} catch (error) {{
-        status.textContent = 'Le fichier n’a pas pu être lu. Vérifie le format et la colonne SIRET.';
+        status.textContent = 'Le portefeuille n’a pas pu être chargé. Vérifie le format, la colonne SIRET et la disponibilité du service de lookup.';
         console.error(error);
       }}
     }});
